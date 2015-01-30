@@ -1,0 +1,50 @@
+require 'active_record/connection_adapters/postgresql_adapter'
+
+ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
+  # create_function(:do_a_thing, returns: :trigger) do
+  #   <<-SQL
+  #   BEGIN
+  #     -- ...
+  #     -- PL/pgSQL function body
+  #     -- ...
+  #   END
+  #   SQL
+  # end
+  def create_function(name, *args, replace: true, returns:, &block)
+    command = replace ? 'CREATE OR REPLACE FUNCTION' : 'CREATE FUNCTION'
+    execute \
+      "#{command} #{name}(#{args.join(', ')}) RETURNS #{returns} AS $PROC$" \
+      " #{yield}" \
+      " $PROC$ LANGUAGE plpgsql"
+  end
+
+  # remove_function(:do_a_thing)
+  def remove_function(name, must_exist: false, cascade: false)
+    command = must_exist ? 'DROP FUNCTION' : 'DROP FUNCTION IF EXISTS'
+    execute "#{command} #{name}() #{'CASCADE' if cascade}"
+  end
+
+  # create_trigger(:do_a_thing, before: [:insert, :update], on: :widgets)
+  def create_trigger(name, on:, before: nil, after: nil, execute: name, replace: true)
+    if before
+      when_to_run = :before
+      events = Array(before)
+    elsif after
+      when_to_run = :after
+      events = Array(after)
+    else
+      raise ArgumentError, 'must provide either :before or :after keyword argument'
+    end
+
+    remove_trigger(name, on: on) if replace
+    execute \
+      "CREATE TRIGGER #{name} #{when_to_run.upcase} #{events.map(&:upcase).join(' OR ')} ON #{on}" \
+      " FOR EACH ROW EXECUTE PROCEDURE #{execute}()"
+  end
+
+  # remove_trigger(:do_a_thing, on: :widgets)
+  def remove_trigger(name, on:, must_exist: false)
+    command = must_exist ? 'DROP TRIGGER' : 'DROP TRIGGER IF EXISTS'
+    execute "#{command} #{name} ON #{on}"
+  end
+end
