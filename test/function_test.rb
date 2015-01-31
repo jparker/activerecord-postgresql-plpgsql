@@ -49,4 +49,50 @@ class FunctionTest < Minitest::Test
 
     assert_match /PG::UndefinedFunction/, err.message
   end
+
+  def test_remove_function_when_function_does_not_exist_raises_error
+    err = assert_raises ActiveRecord::StatementInvalid do
+      schema do
+        remove_function(:forty_two)
+      end
+    end
+
+    assert_match /PG::UndefinedFunction/, err.message
+  end
+
+  def test_remove_function_with_if_exists
+    # Failure mode would be to raise an exception.
+    schema do
+      remove_function(:forty_two, if_exists: true)
+    end
+  end
+
+  def test_remove_function_with_dependent_objects_raises_error
+    schema do
+      create_table(:widgets)
+      create_function(:forty_two, as: 'BEGIN RETURN NULL; END', returns: :trigger)
+      create_trigger(:forty_two, on: :widgets, before: :insert)
+    end
+
+    err = assert_raises ActiveRecord::StatementInvalid do
+      schema do
+        remove_function(:forty_two)
+      end
+    end
+
+    assert_match /PG::DependentObjectsStillExist/, err.message
+  end
+
+  def test_remove_function_with_cascade
+    schema do
+      create_table(:widgets)
+      create_function(:forty_two, as: 'BEGIN RETURN NULL; END', returns: :trigger)
+      create_trigger(:forty_two, on: :widgets, before: :insert)
+    end
+
+    # Failure mode would be to raise an exception.
+    schema do
+      remove_function(:forty_two, cascade: true)
+    end
+  end
 end

@@ -8,7 +8,7 @@ ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
   #   -- ...
   # END
   # SQL
-  def create_function(name, *args, as:, returns:, replace: true)
+  def create_function(name, *args, as:, returns:, replace: false)
     command = replace ? 'CREATE OR REPLACE FUNCTION' : 'CREATE FUNCTION'
     execute \
       "#{command} #{name}(#{args.join(', ')}) RETURNS #{returns} AS $PROC$" \
@@ -17,13 +17,13 @@ ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
   end
 
   # remove_function(:do_a_thing)
-  def remove_function(name, must_exist: false, cascade: false)
-    command = must_exist ? 'DROP FUNCTION' : 'DROP FUNCTION IF EXISTS'
+  def remove_function(name, if_exists: false, cascade: false)
+    command = if_exists ? 'DROP FUNCTION IF EXISTS' : 'DROP FUNCTION'
     execute "#{command} #{name}() #{'CASCADE' if cascade}"
   end
 
   # create_trigger(:do_a_thing, before: [:insert, :update], on: :widgets)
-  def create_trigger(name, on:, before: nil, after: nil, execute: name, replace: true)
+  def create_trigger(name, on:, before: nil, after: nil, execute: name, replace: false)
     if before && !Array(before).empty?
       context = "BEFORE #{Array(before).map(&:upcase).join(' OR ')}"
     elsif after && !Array(after).empty?
@@ -39,8 +39,8 @@ ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
   end
 
   # remove_trigger(:do_a_thing, on: :widgets)
-  def remove_trigger(name, on:, must_exist: false)
-    command = must_exist ? 'DROP TRIGGER' : 'DROP TRIGGER IF EXISTS'
+  def remove_trigger(name, on:, if_exists: false)
+    command = if_exists ? 'DROP TRIGGER IF EXISTS' : 'DROP TRIGGER'
     execute "#{command} #{name} ON #{on}"
   end
 end
