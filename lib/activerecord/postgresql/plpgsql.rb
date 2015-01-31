@@ -1,20 +1,18 @@
 require 'active_record/connection_adapters/postgresql_adapter'
 
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
-  # create_function(:do_a_thing, returns: :trigger) do
-  #   <<-SQL
-  #   BEGIN
-  #     -- ...
-  #     -- PL/pgSQL function body
-  #     -- ...
-  #   END
-  #   SQL
-  # end
-  def create_function(name, *args, replace: true, returns:, &block)
+  # create_function(:do_a_thing, as:<<SQL, returns: :trigger)
+  # BEGIN
+  #   -- ...
+  #   -- PL/pgSQL function body
+  #   -- ...
+  # END
+  # SQL
+  def create_function(name, *args, as:, returns:, replace: true)
     command = replace ? 'CREATE OR REPLACE FUNCTION' : 'CREATE FUNCTION'
     execute \
       "#{command} #{name}(#{args.join(', ')}) RETURNS #{returns} AS $PROC$" \
-      " #{yield}" \
+      " #{as}" \
       " $PROC$ LANGUAGE plpgsql"
   end
 
