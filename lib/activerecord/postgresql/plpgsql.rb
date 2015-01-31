@@ -24,19 +24,17 @@ ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
 
   # create_trigger(:do_a_thing, before: [:insert, :update], on: :widgets)
   def create_trigger(name, on:, before: nil, after: nil, execute: name, replace: true)
-    if before
-      when_to_run = :before
-      events = Array(before)
-    elsif after
-      when_to_run = :after
-      events = Array(after)
+    if before && !Array(before).empty?
+      context = "BEFORE #{Array(before).map(&:upcase).join(' OR ')}"
+    elsif after && !Array(after).empty?
+      context = "AFTER #{Array(after).map(&:upcase).join(' OR ')}"
     else
       raise ArgumentError, 'must provide either :before or :after keyword argument'
     end
 
     remove_trigger(name, on: on) if replace
     execute \
-      "CREATE TRIGGER #{name} #{when_to_run.upcase} #{events.map(&:upcase).join(' OR ')} ON #{on}" \
+      "CREATE TRIGGER #{name} #{context} ON #{on}" \
       " FOR EACH ROW EXECUTE PROCEDURE #{execute}()"
   end
 
