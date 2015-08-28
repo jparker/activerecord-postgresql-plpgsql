@@ -1,3 +1,5 @@
+# [![Build Status](https://travis-ci.org/jparker/activerecord-postgresql-plpgsql.svg?branch=master)](https://travis-ci.org/jparker/activerecord-postgresql-plpgsql)
+
 # ActiveRecord::Migration support for PostgreSQL triggers/functions
 
 This gem provides helpers for creating and removing PL/pgSQL functions and
