@@ -3,7 +3,7 @@ require 'test_helper'
 class FunctionTest < Minitest::Test
   def test_create_function
     schema do
-      create_function(:forty_two, as: 'BEGIN RETURN 42; END', returns: :integer)
+      create_function :forty_two, as: 'BEGIN RETURN 42; END', returns: :integer
     end
 
     assert_equal '42', select_value('SELECT forty_two()')
@@ -11,7 +11,7 @@ class FunctionTest < Minitest::Test
 
   def test_create_function_with_arguments
     schema do
-      create_function(:add_two_ints, :integer, :integer, as: 'BEGIN RETURN $1+$2; END', returns: :integer)
+      create_function :add_two_ints, :integer, :integer, as: 'BEGIN RETURN $1+$2; END', returns: :integer
     end
 
     assert_equal '42', select_value('SELECT add_two_ints(20, 22)')
@@ -19,8 +19,8 @@ class FunctionTest < Minitest::Test
 
   def test_create_or_replace_function
     schema do
-      create_function(:forty_two, as: 'BEGIN RETURN -1; END', returns: :integer)
-      create_function(:forty_two, as: 'BEGIN RETURN 42; END', returns: :integer, replace: true)
+      create_function :forty_two, as: 'BEGIN RETURN -1; END', returns: :integer
+      create_function :forty_two, as: 'BEGIN RETURN 42; END', returns: :integer, replace: true
     end
 
     assert_equal '42', select_value('SELECT forty_two()')
@@ -29,8 +29,8 @@ class FunctionTest < Minitest::Test
   def test_create_function_when_matching_function_exists_raises_error
     err = assert_raises ActiveRecord::StatementInvalid do
       schema do
-        create_function(:forty_two, as: 'BEGIN RETURN -1; END', returns: :integer)
-        create_function(:forty_two, as: 'BEGIN RETURN 42; END', returns: :integer, replace: false)
+        create_function :forty_two, as: 'BEGIN RETURN -1; END', returns: :integer
+        create_function :forty_two, as: 'BEGIN RETURN 42; END', returns: :integer, replace: false
       end
     end
 
@@ -39,12 +39,12 @@ class FunctionTest < Minitest::Test
 
   def test_remove_function
     schema do
-      create_function(:forty_two, as: 'BEGIN RETURN 42; END', returns: :integer)
-      remove_function(:forty_two)
+      create_function :forty_two, as: 'BEGIN RETURN 42; END', returns: :integer
+      remove_function :forty_two
     end
 
     err = assert_raises ActiveRecord::StatementInvalid do
-      select_value('SELECT forty_two()')
+      select_value 'SELECT forty_two()'
     end
 
     assert_match /PG::UndefinedFunction/, err.message
@@ -53,7 +53,7 @@ class FunctionTest < Minitest::Test
   def test_remove_function_when_function_does_not_exist_raises_error
     err = assert_raises ActiveRecord::StatementInvalid do
       schema do
-        remove_function(:forty_two)
+        remove_function :forty_two
       end
     end
 
@@ -61,22 +61,24 @@ class FunctionTest < Minitest::Test
   end
 
   def test_remove_function_with_if_exists
-    # Failure mode would be to raise an exception.
     schema do
-      remove_function(:forty_two, if_exists: true)
+      remove_function :forty_two, if_exists: true
     end
+
+    # If no exception has been raised, this test passes.
+    pass
   end
 
   def test_remove_function_with_dependent_objects_raises_error
     schema do
-      create_table(:widgets)
-      create_function(:forty_two, as: 'BEGIN RETURN NULL; END', returns: :trigger)
-      create_trigger(:forty_two, on: :widgets, before: :insert)
+      create_table :widgets
+      create_function :forty_two, as: 'BEGIN RETURN NULL; END', returns: :trigger
+      create_trigger :forty_two, on: :widgets, before: :insert
     end
 
     err = assert_raises ActiveRecord::StatementInvalid do
       schema do
-        remove_function(:forty_two)
+        remove_function :forty_two
       end
     end
 
@@ -85,14 +87,16 @@ class FunctionTest < Minitest::Test
 
   def test_remove_function_with_cascade
     schema do
-      create_table(:widgets)
-      create_function(:forty_two, as: 'BEGIN RETURN NULL; END', returns: :trigger)
-      create_trigger(:forty_two, on: :widgets, before: :insert)
+      create_table :widgets
+      create_function :forty_two, as: 'BEGIN RETURN NULL; END', returns: :trigger
+      create_trigger :forty_two, on: :widgets, before: :insert
     end
 
-    # Failure mode would be to raise an exception.
     schema do
-      remove_function(:forty_two, cascade: true)
+      remove_function :forty_two, cascade: true
     end
+
+    # If no exception has been raised, this test passes.
+    pass
   end
 end

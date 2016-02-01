@@ -4,6 +4,10 @@ require 'minitest/autorun'
 require 'active_record'
 require 'activerecord/postgresql/plpgsql'
 
+require 'forwardable'
+require 'minitest/focus'
+require 'pry'
+
 ActiveRecord::Base.establish_connection({
   adapter:  'postgresql',
   database: 'activerecord_postgresql_plpgsql_test',
@@ -14,6 +18,8 @@ ActiveRecord::Base.establish_connection({
 })
 
 class Minitest::Test
+  extend Forwardable
+
   def setup
     connection.begin_db_transaction
   end
@@ -35,7 +41,5 @@ class Minitest::Test
     end
   end
 
-  def select_value(*args)
-    connection.select_value(*args)
-  end
+  delegate [:select_value, :execute] => :connection
 end

@@ -23,14 +23,27 @@ ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
   end
 
   # create_trigger :name_of_trigger, before: [:insert, :update], on: 'table_name'
-  def create_trigger(name, on:, before: nil, after: nil, execute: name, replace: false)
-    if before && !Array(before).empty?
-      context = "BEFORE #{Array(before).map(&:upcase).join(' OR ')}"
-    elsif after && !Array(after).empty?
-      context = "AFTER #{Array(after).map(&:upcase).join(' OR ')}"
-    else
-      raise ArgumentError, 'must provide either :before or :after keyword argument'
+  def create_trigger(name, before: nil, after: nil, of: nil, on:, execute: name, replace: false)
+    before = Array(before)
+    after  = Array(after)
+    of     = Array(of)
+
+    if before.empty? && after.empty?
+      raise ArgumentError, 'missing keyword: before or after'
+    elsif !before.empty? && !after.empty?
+      raise ArgumentError, 'incompatible keywords: before and after may not be used together'
     end
+
+    timing = before.empty? ? 'AFTER' : 'BEFORE'
+    contexts = before.empty? ? after : before
+    contexts.map! do |context|
+      if context == :update && !of.empty?
+        "UPDATE OF #{of.join(', ')}"
+      else
+        context.upcase
+      end
+    end
+    context = "#{timing} #{contexts.join ' OR '}"
 
     remove_trigger name, on: on, if_exists: true if replace
     execute \
