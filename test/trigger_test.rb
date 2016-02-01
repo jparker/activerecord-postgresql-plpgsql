@@ -93,6 +93,29 @@ class TriggerTest < Minitest::Test
     assert_match /missing keyword: before or after/, err.message
   end
 
+  def test_create_trigger_that_fires_once_per_statement
+    schema do
+      create_table(:foo) { |t| t.integer :bar }
+      create_table :bar do |t|
+        t.integer :row_counter
+        t.integer :stmt_counter
+      end
+      create_function :row_counter, as: <<-SQL.strip, returns: :trigger
+        BEGIN UPDATE bar SET row_counter = row_counter + 1; RETURN NULL; END
+      SQL
+      create_function :stmt_counter, as: <<-SQL.strip, returns: :trigger
+        BEGIN UPDATE bar SET stmt_counter = stmt_counter + 1; RETURN NULL; END
+      SQL
+      create_trigger :row_counter, after: :insert, on: :foo, foreach: :row
+      create_trigger :stmt_counter, after: :insert, on: :foo, foreach: :statement
+    end
+
+    execute 'INSERT INTO bar(row_counter, stmt_counter) VALUES(0, 0)'
+    execute 'INSERT INTO foo(bar) VALUES(1), (1), (1)'
+    assert_equal '3', select_value('SELECT row_counter FROM bar LIMIT 1')
+    assert_equal '1', select_value('SELECT stmt_counter FROM bar LIMIT 1')
+  end
+
   def test_replace_trigger
     skip
   end

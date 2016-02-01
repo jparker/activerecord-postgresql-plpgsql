@@ -23,7 +23,7 @@ ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
   end
 
   # create_trigger :name_of_trigger, before: [:insert, :update], on: 'table_name'
-  def create_trigger(name, before: nil, after: nil, of: nil, on:, execute: name, replace: false)
+  def create_trigger(name, before: nil, after: nil, of: nil, on:, foreach: :row, execute: name, replace: false)
     before = Array(before)
     after  = Array(after)
     of     = Array(of)
@@ -32,6 +32,10 @@ ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
       raise ArgumentError, 'missing keyword: before or after'
     elsif !before.empty? && !after.empty?
       raise ArgumentError, 'incompatible keywords: before and after may not be used together'
+    end
+
+    if foreach != :statement && foreach != :row
+      raise ArgumentError, 'foreach must be one of :statement or :row'
     end
 
     timing = before.empty? ? 'AFTER' : 'BEFORE'
@@ -48,7 +52,7 @@ ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
     remove_trigger name, on: on, if_exists: true if replace
     execute \
       "CREATE TRIGGER #{name} #{context} ON #{on}" \
-      " FOR EACH ROW EXECUTE PROCEDURE #{execute}()"
+      " FOR EACH #{foreach.upcase} EXECUTE PROCEDURE #{execute}()"
   end
 
   # remove_trigger :name_of_trigger, on: 'table_name'

@@ -41,5 +41,5 @@ class Minitest::Test
     end
   end
 
-  delegate [:select_value, :execute] => :connection
+  delegate [:select_all, :select_value, :execute] => :connection
 end
