@@ -17,9 +17,9 @@ ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
   end
 
   # remove_function :name_of_function
-  def remove_function(name, if_exists: false, cascade: false)
+  def remove_function(name, *args, if_exists: false, cascade: false)
     command = if_exists ? 'DROP FUNCTION IF EXISTS' : 'DROP FUNCTION'
-    execute "#{command} #{name}() #{'CASCADE' if cascade}"
+    execute "#{command} #{name}(#{args.join(', ')}) #{'CASCADE' if cascade}"
   end
 
   # create_trigger :name_of_trigger, before: [:insert, :update], on: 'table_name'
