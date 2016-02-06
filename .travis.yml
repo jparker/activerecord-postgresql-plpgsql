@@ -13,3 +13,5 @@ services:
   - postgresql
 before_script:
   - createdb activerecord_postgresql_plpgsql_test
+addons:
+  postgresql: '9.3'
