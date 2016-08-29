@@ -1,3 +1,5 @@
+require 'active_support'
+require 'active_support/deprecation'
 require 'active_record/connection_adapters/postgresql_adapter'
 
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
