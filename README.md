@@ -30,15 +30,13 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
-create_function(:do_something, returns: :trigger) do
-  <<-SQL
+create_function(:do_something, as: <<~SQL, returns: :trigger)
   BEGIN
     -- ...
     -- PL/pgSQL function body
     -- ...
   END
-  SQL
-end
+SQL
 ```
 
 ```ruby
@@ -52,7 +50,6 @@ create_trigger(:do_something, before: [:insert, :update], on: :widgets)
 ```ruby
 remove_trigger(:do_something, on: :widgets)
 ```
-TODO: Write usage instructions here
 
 ## Contributing
 

@@ -1,11 +1,11 @@
-appraise 'activerecord-40' do
-  gem 'activerecord', '4.0.13'
-end
-
 appraise 'activerecord-41' do
-  gem 'activerecord', '4.1.12'
+  gem 'activerecord', '4.1.16'
 end
 
 appraise 'activerecord-42' do
-  gem 'activerecord', '4.2.4'
+  gem 'activerecord', '4.2.7.1'
+end
+
+appraise 'activerecord-50' do
+  gem 'activerecord', '5.0.0.1'
 end

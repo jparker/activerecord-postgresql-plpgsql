@@ -9,9 +9,9 @@ class TriggerTest < Minitest::Test
     end
 
     execute 'INSERT INTO foo(bar) VALUES(101)'
-    assert_equal '42', select_value('SELECT bar FROM foo LIMIT 1')
+    assert_equal 42, Integer(select_value('SELECT bar FROM foo LIMIT 1'))
     execute 'UPDATE foo SET bar = 101'
-    assert_equal '101', select_value('SELECT bar FROM foo LIMIT 1')
+    assert_equal 101, Integer(select_value('SELECT bar FROM foo LIMIT 1'))
   end
 
   def test_create_trigger_as_before_hook_for_multiple_events
@@ -22,10 +22,10 @@ class TriggerTest < Minitest::Test
     end
 
     execute 'INSERT INTO foo(bar) VALUES(101)'
-    assert_equal '42', select_value('SELECT bar FROM foo LIMIT 1')
+    assert_equal 42, Integer(select_value('SELECT bar FROM foo LIMIT 1'))
 
     execute 'UPDATE foo SET bar = 101'
-    assert_equal '42', select_value('SELECT bar FROM foo LIMIT 1')
+    assert_equal 42, Integer(select_value('SELECT bar FROM foo LIMIT 1'))
   end
 
   def test_create_trigger_as_after_hook
@@ -39,7 +39,7 @@ class TriggerTest < Minitest::Test
     end
 
     execute 'INSERT INTO foo(bar) VALUES(42)'
-    assert_equal '42', select_value('SELECT foo FROM bar LIMIT 1')
+    assert_equal 42, Integer(select_value('SELECT foo FROM bar LIMIT 1'))
   end
 
   def test_create_trigger_as_after_hook_for_multiple_events
@@ -54,9 +54,9 @@ class TriggerTest < Minitest::Test
 
     execute 'INSERT INTO bar(foos_count) VALUES(0)'
     execute 'INSERT INTO foo(bar) VALUES(42)'
-    assert_equal '1', select_value('SELECT foos_count FROM bar LIMIT 1')
+    assert_equal 1, Integer(select_value('SELECT foos_count FROM bar LIMIT 1'))
     execute 'DELETE FROM foo'
-    assert_equal '0', select_value('SELECT foos_count FROM bar LIMIT 1')
+    assert_equal 0, Integer(select_value('SELECT foos_count FROM bar LIMIT 1'))
   end
 
   def test_create_trigger_with_update_column_constraint
@@ -71,16 +71,16 @@ class TriggerTest < Minitest::Test
 
     execute 'INSERT INTO foo(bar, baz, froz) VALUES(1, 1, 1)'
     execute 'INSERT INTO bar(counter) VALUES(0)'
-    assert_equal '0', select_value('SELECT counter FROM bar LIMIT 1')
+    assert_equal 0, Integer(select_value('SELECT counter FROM bar LIMIT 1'))
 
     execute 'UPDATE foo SET bar = bar + 1'
-    assert_equal '1', select_value('SELECT counter FROM bar LIMIT 1')
+    assert_equal 1, Integer(select_value('SELECT counter FROM bar LIMIT 1'))
 
     execute 'UPDATE foo SET baz = baz + 1'
-    assert_equal '2', select_value('SELECT counter FROM bar LIMIT 1')
+    assert_equal 2, Integer(select_value('SELECT counter FROM bar LIMIT 1'))
 
     execute 'UPDATE foo SET froz = froz + 1'
-    assert_equal '2', select_value('SELECT counter FROM bar LIMIT 1')
+    assert_equal 2, Integer(select_value('SELECT counter FROM bar LIMIT 1'))
   end
 
   def test_create_trigger_without_before_or_after_raises_error
@@ -112,8 +112,8 @@ class TriggerTest < Minitest::Test
 
     execute 'INSERT INTO bar(row_counter, stmt_counter) VALUES(0, 0)'
     execute 'INSERT INTO foo(bar) VALUES(1), (1), (1)'
-    assert_equal '3', select_value('SELECT row_counter FROM bar LIMIT 1')
-    assert_equal '1', select_value('SELECT stmt_counter FROM bar LIMIT 1')
+    assert_equal 3, Integer(select_value('SELECT row_counter FROM bar LIMIT 1'))
+    assert_equal 1, Integer(select_value('SELECT stmt_counter FROM bar LIMIT 1'))
   end
 
   def test_replace_trigger
@@ -133,7 +133,7 @@ class TriggerTest < Minitest::Test
     end
 
     execute 'INSERT INTO foo(bar) VALUES(101)'
-    assert_equal '101', select_value('SELECT bar FROM foo LIMIT 1')
+    assert_equal 101, Integer(select_value('SELECT bar FROM foo LIMIT 1'))
   end
 
   def test_remove_trigger_that_does_not_exist_raises_error

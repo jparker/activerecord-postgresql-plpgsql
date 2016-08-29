@@ -5,8 +5,7 @@ class FunctionTest < Minitest::Test
     schema do
       create_function :forty_two, as: 'BEGIN RETURN 42; END', returns: :integer
     end
-
-    assert_equal '42', select_value('SELECT forty_two()')
+    assert_equal 42, Integer(select_value('SELECT forty_two()'))
   end
 
   def test_create_function_with_arguments
@@ -14,7 +13,7 @@ class FunctionTest < Minitest::Test
       create_function :adder, :integer, :integer, as: 'BEGIN RETURN $1+$2; END', returns: :integer
     end
 
-    assert_equal '42', select_value('SELECT adder(20, 22)')
+    assert_equal 42, Integer(select_value('SELECT adder(20, 22)'))
   end
 
   def test_create_function_with_named_arguments
@@ -23,7 +22,7 @@ class FunctionTest < Minitest::Test
         as: 'BEGIN RETURN a+b; END', returns: :integer
     end
 
-    assert_equal '43', select_value('SELECT adder(42, 1)')
+    assert_equal 43, Integer(select_value('SELECT adder(42, 1)'))
   end
 
   def test_create_or_replace_function
@@ -31,7 +30,7 @@ class FunctionTest < Minitest::Test
       create_function :forty_two, as: 'BEGIN RETURN -1; END', returns: :integer
       create_function :forty_two, as: 'BEGIN RETURN 42; END', returns: :integer, replace: true
     end
-    assert_equal '42', select_value('SELECT forty_two()')
+    assert_equal 42, Integer(select_value('SELECT forty_two()'))
   end
 
   def test_create_function_when_matching_function_exists_raises_error
@@ -48,7 +47,7 @@ class FunctionTest < Minitest::Test
     schema do
       create_function :forty_two, as: 'BEGIN RETURN 42; END', returns: :integer
     end
-    assert_equal '42', select_value('SELECT forty_two()')
+    select_value('SELECT forty_two()')
 
     schema do
       remove_function :forty_two
@@ -64,7 +63,7 @@ class FunctionTest < Minitest::Test
       create_function :adder, 'a integer', 'b integer',
         as: 'BEGIN RETURN a+b; END', returns: :integer
     end
-    assert_equal '43', select_value('SELECT adder(42, 1)')
+    select_value('SELECT adder(42, 1)')
 
     schema do
       remove_function :adder, 'a integer', 'b integer'
