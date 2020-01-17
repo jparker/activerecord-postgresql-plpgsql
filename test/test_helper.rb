@@ -11,7 +11,7 @@ require 'pry'
 
 ActiveRecord::Base.establish_connection({
   adapter:  'postgresql',
-  database: 'activerecord_postgresql_plpgsql_test',
+  database: ENV['DB'] || 'activerecord_postgresql_plpgsql_test',
   username: ENV['DB_USERNAME'] || ENV['USER'],
   password: ENV['DB_PASSWORD'],
   host:     'localhost',
