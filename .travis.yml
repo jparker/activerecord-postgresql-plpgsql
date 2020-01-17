@@ -1,17 +1,13 @@
 language: ruby
 rvm:
-  - '2.6.5'
-  - '2.5.7'
+  - 2.6.5
+  - 2.5.7
 gemfile:
   - gemfiles/activerecord_52.gemfile
   - gemfiles/activerecord_60.gemfile
-env:
-  - DB_USERNAME=postgres
 services:
-  - postgresql
-addons:
-  postgresql: '11'
-  apt:
-    packages:
-      - postgresql-11
-      - postgresql-client-11
+  - docker
+before_install:
+  - docker-compose up -d
+after_script:
+  - docker-compose down

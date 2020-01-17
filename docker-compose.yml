@@ -3,7 +3,7 @@ version: "3"
 services:
   db:
     environment:
-      POSTGRES_DB: active_record_postgresql_plpgsql_test
-    image: postgres
+      POSTGRES_DB: activerecord_postgresql_plpgsql_test
+    image: postgres:11
     ports:
       - "5432:5432"

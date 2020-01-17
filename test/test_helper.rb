@@ -11,11 +11,11 @@ require 'pry'
 
 ActiveRecord::Base.establish_connection({
   adapter:  'postgresql',
-  database: ENV['DB'] || 'postgres',
-  username: ENV['DB_USERNAME'] || 'postgres',
-  password: ENV['DB_PASSWORD'],
-  host:     'localhost',
-  port:     ENV['DB_PORT'] || 5432,
+  database: ENV['POSTGRES_DB'] || 'activerecord_postgresql_plpgsql_test',
+  username: ENV['POSTGRES_USER'] || 'postgres',
+  password: ENV['POSTGRES_PASSWORD'],
+  host:     ENV['POSTGRES_HOST'] || 'localhost',
+  port:     ENV['POSTGRES_PORT'] || 5432,
 })
 
 DatabaseCleaner.strategy = :transaction
