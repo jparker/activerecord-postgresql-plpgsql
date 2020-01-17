@@ -1,0 +1,9 @@
+---
+version: "3"
+services:
+  db:
+    environment:
+      POSTGRES_DB: active_record_postgresql_plpgsql_test
+    image: postgres
+    ports:
+      - "5432:5432"

@@ -1,11 +1,10 @@
 language: ruby
 rvm:
-  - '2.2.5'
-  - '2.3.1'
+  - '2.6.5'
+  - '2.5.7'
 gemfile:
-  - gemfiles/activerecord_41.gemfile
-  - gemfiles/activerecord_42.gemfile
-  - gemfiles/activerecord_50.gemfile
+  - gemfiles/activerecord_52.gemfile
+  - gemfiles/activerecord_60.gemfile
 env:
   - DB_USERNAME=postgres
 services:
@@ -13,4 +12,4 @@ services:
 before_script:
   - createdb activerecord_postgresql_plpgsql_test
 addons:
-  postgresql: '9.4'
+  postgresql: '11'
