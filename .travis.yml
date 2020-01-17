@@ -9,8 +9,6 @@ env:
   - DB_USERNAME=postgres
 services:
   - postgresql
-before_script:
-  - createdb activerecord_postgresql_plpgsql_test
 addons:
   postgresql: '11'
   apt:
