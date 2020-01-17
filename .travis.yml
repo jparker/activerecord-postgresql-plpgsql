@@ -13,3 +13,7 @@ before_script:
   - createdb activerecord_postgresql_plpgsql_test
 addons:
   postgresql: '11'
+  apt:
+    packages:
+      - postgresql-11
+      - postgresql-client-11
